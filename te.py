@@ -34,6 +34,11 @@ def create_Employee_window():
 
         fildPhone = ttk.Entry(table_window, textvariable=listStringVar[-1][2])
         fildPhone.grid(row=row, column=2, ipadx=6,  ipady=6, padx=5, pady=5)
+        
+
+        btn1 = ttk.Button(table_window, text="edit")
+        btn1.grid(row=row, column=3, ipadx=6,  ipady=6, padx=5, pady=5)
+
         row += 1
 
     table_window.mainloop()

@@ -1,16 +1,19 @@
 import psycopg2
+from psycopg2 import extensions
 #Klim_Trade
 #postgres
 #wer23yu9
-def connect():
+def connect() -> extensions.connection:
     conn = psycopg2.connect(host='localhost', 
     user='postgres', 
     password='wer23yu9', 
     dbname='Klim_Trade')
-    return conn.cursor()
+    return conn
 
 
-def CreateCustomers(cursor, custName, custSurname, custPhone):
+def AddCustomer(custName, custSurname, custPhone):
+    connector = connect()
+    cursor = connector.cursor()
     try:
         cursor.execute(f"""
                 CREATE TABLE Customers(
@@ -22,38 +25,54 @@ def CreateCustomers(cursor, custName, custSurname, custPhone):
                 """)
     except Exception as e:
         print(e)
+    cursor.close()
+    connector.close()
 
-def Dismissal(cursor, emplName, emplSurname):
+def Dismissal(ID):
+    connector = connect()
+    cursor = connector.cursor()
     try:
         cursor.execute(f"""
-                UPDATE Employees SET Status = FALSE
-                WHERE EmployeeName = {emplName} AND SurName = {emplSurname};
+                UPDATE Employees SET Status = false
+                WHERE EmployeeID = {str(ID)};
                 """)
+        connector.commit()
     except Exception as e:
         print(e)
+    finally:
+        cursor.close()
+        connector.close()
 
-def CreateEmployee(cursor, emplName, emplSurname, emplPhone):
+def AddEmployee(emplName, emplSurname, emplPhone):
+    connector = connect()
+    cursor = connector.cursor()
     cursor.execute(f"""
                 SELECT * FROM Employees 
-                WHERE EmployeeName = {emplName},
-                SurName = {emplSurname}, Phone = {emplPhone};
+                WHERE EmployeeName = '{emplName}' AND
+                SurName = '{emplSurname}' AND Phone = '{emplPhone}';
                 """)
     count = cursor.rowcount
     if count != 0:
         cursor.execute(f"""
                 UPDATE Employees SET Status = TRUE
-                WHERE EmployeeName = {emplName}
-                AND SurName = {emplSurname} AND Phone={emplPhone};
+                WHERE EmployeeName = '{emplName}'
+                AND SurName = '{emplSurname}' AND Phone='{emplPhone}';
                 """)
+        connector.commit()
     else:
         cursor.execute(f"""
                 INSERT INTO Employees
                 (EmployeeName, SurName, Phone) 
                 VALUES 
-                ({emplName}, {emplSurname}, {emplPhone});
+                ('{emplName}', '{emplSurname}', '{emplPhone}');
                 """)
+        connector.commit()
+    cursor.close()
+    connector.close()
 
-def ChangePrice(cursor, servName, servPrice):
+def ChangePrice(servName, servPrice):
+    connector = connect()
+    cursor = connector.cursor()
     try:
         cursor.execute(f"""
                 UPDATE Services SET Price = {servPrice} WHERE ServiceName = {servName};
@@ -61,7 +80,9 @@ def ChangePrice(cursor, servName, servPrice):
     except Exception as e:
         print(e)
 
-def CreateService(cursor, servName, servPrice):
+def AddService(servName, servPrice):
+    connector = connect()
+    cursor = connector.cursor()
     cursor.execute(f"""
                 SELECT * FROM Services 
                 WHERE ServiceName = {servName}, Price = {servPrice};
@@ -75,7 +96,9 @@ def CreateService(cursor, servName, servPrice):
                 ({servName}, {servPrice});
                 """)
 
-def CreateOrder(cursor, custName, custSurname, custPhone, orderDate, service, address, employee, customer):
+def AddOrder(custName, custSurname, custPhone, orderDate, service, address, employee, customer):
+    connector = connect()
+    cursor = connector.cursor()
     cursor.execute(f"""
                 SELECT * FROM Customers
                 WHERE CustomerName = {custName},
@@ -90,39 +113,53 @@ def CreateOrder(cursor, custName, custSurname, custPhone, orderDate, service, ad
                 ({orderDate}, {service}, {address}, {employee}, {customer});
                 """)
     else:
-        CreateCustomers(cursor, custName, custSurname, custPhone)
+        AddCustomer(cursor, custName, custSurname, custPhone)
+    cursor.close()
+    connector.close()
 
 def GetEmployees(cursor):
-    cursor.execute(f"""SELECT EmployeeName, Surname, Phone FROM Employees WHERE Status = TRUE;""")
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(f"""SELECT EmployeeName, Surname, Phone, EmployeeID FROM Employees WHERE Status = TRUE;""")
     results = cursor.fetchall()
     return results
 
 def GetCustomers(cursor):
+    conn = connect()
+    cursor = conn.cursor()
     cursor.execute(f"""SELECT CustomerName, Surname, Phone FROM Customers;""")
     results = cursor.fetchall()
     return results
 
 def GetServices(cursor):
+    conn = connect()
+    cursor = conn.cursor()
     cursor.execute(f"""SELECT ServiceName, Price FROM Services;""")
     results = cursor.fetchall()
     return results
         
 def GetOrders(cursor):
+    conn = connect()
+    cursor = conn.cursor()
     cursor.execute(f"""SELECT OrderDate, Service, Address, Employee, Customer FROM Orders;""")
     results = cursor.fetchall()
     return results
 
 if __name__ == "__main__":
     print("Start")
-    cursor = connect()
-    results = GetOrders(cursor)
-    for row in results:
-        Date= row[0]
-        Service= row[1]
-        Address= row[2]
-        Employee= row[3]
-        Customer= row[4]
-        print(f"{Date} {Service} {Address} {Employee} {Customer} ")
+    conn = connect()
+    # results = GetEmployees(cursor)
+    # for row in results:
+    #     EmployeeName= row[0]
+    #     EmployeeSurname= row[1]
+    #     EmployeePhone= row[2]
+    #     EmployeeID= row[3]
+
+    #     print(f"{EmployeeName} {EmployeeSurname} {EmployeePhone} {EmployeeID}")
+
+    # Dismissal(1)
+    AddEmployee("Клим", "Минеев", "67772223")
+    #Dismissal(5)
 
 
     

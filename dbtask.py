@@ -4,7 +4,7 @@ from psycopg2 import extensions
 #postgres
 #wer23yu9
 def connect() -> extensions.connection:
-    conn = psycopg2.connect(host='localhost', 
+    conn = psycopg2.connect(host='192.168.88.51', 
     user='postgres', 
     password='wer23yu9', 
     dbname='Klim_Trade')
@@ -177,23 +177,23 @@ def GetOrders(cursor):
     cursor = conn.cursor()
     cursor.execute(f"""SELECT OrderDate, Service, Address, Employee, Customer, OrderID FROM Orders;""")
     results = cursor.fetchall()
-    return results
+    common_results = []
+    for result in results:
+        date = result[0]
+        cursor.execute(f"""SELECT ServiceName FROM Services WHERE ServiceID = {result[1]};""")
+        service = cursor.fetchall()[0][0]
+        address = result[2]
+        cursor.execute(f"""SELECT EmployeeName, Surname FROM Employees WHERE EmployeeID = {result[3]};""")
+        e_name, e_surname = cursor.fetchall()[0]
+        cursor.execute(f"""SELECT CustomerName, Surname FROM Customers WHERE CustomerID = {result[4]};""")
+        c_name, c_surname = cursor.fetchall()[0]
+        id = result[5]
+        common_results.append((date, service, address, f"{e_name} {e_surname}", f"{c_name} {c_surname}", id))
+    return common_results
 
 if __name__ == "__main__":
     print("Start")
     conn = connect()
-    # results = GetEmployees(cursor)
-    # for row in results:
-    #     EmployeeName= row[0]
-    #     EmployeeSurname= row[1]
-    #     EmployeePhone= row[2]
-    #     EmployeeID= row[3]
-
-    #     print(f"{EmployeeName} {EmployeeSurname} {EmployeePhone} {EmployeeID}")
-
-    # Dismissal(1)
-    # AddEmployee("Клим", "Минеев", "67772223")
-    #Dismissal(5)
-
+    print(GetOrders())
 
     

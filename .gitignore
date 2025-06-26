@@ -1,0 +1,8 @@
+.vscode/ (VS Code settings).
+.idea/ (PyCharm project files).
+*.swp, *.swo (Vim swap files).
+
+__pycache__/
+*.pyc
+*.pyd
+*.so

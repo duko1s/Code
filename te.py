@@ -6,26 +6,27 @@ import dbtask
 def dismissal(id):
     print("вызов запроса с аргументом ", id)
 
-def add_new_window():
+def add_new_Order_window():
     add_window = tk.Toplevel()
-    add_window.title("Добавить сотрудника")
-    
-    #cursor = dbtask.connect()
+    add_window.title("Добавить услугу")
+            
+    fildDate = ttk.Entry(add_window)
+    fildDate.grid(row=0, column=0, ipadx=6,  ipady=6, padx=5, pady=5)
 
-    #Employees = dbtask.GetEmployees(cursor)
-
-    
-    
-    # row = 0
-    
-    # for item in Employees:
-    #     print(item)
+    fildService = ttk.Entry(add_window)
+    fildService.grid(row=0, column=1, ipadx=6,  ipady=6, padx=5, pady=5)
         
 
-        
+    btn1 = ttk.Button(add_window, text="Добавить", command = lambda: dismissal(fildDate.get()))
+    btn1.grid(row=0, column=4, ipadx=6,  ipady=6, padx=5, pady=5)
 
-        
-        
+    add_window.mainloop()
+
+def add_new_Customer_window():
+    add_window = tk.Toplevel()
+    add_window.title("Добавить заказчика")
+
+
     fildName = ttk.Entry(add_window)
     fildName.grid(row=0, column=0, ipadx=6,  ipady=6, padx=5, pady=5)
 
@@ -35,13 +36,47 @@ def add_new_window():
     fildPhone = ttk.Entry(add_window)
     fildPhone.grid(row=0, column=2, ipadx=6,  ipady=6, padx=5, pady=5)
         
-    value = fildName.get()
-    print(value)
 
-    btn1 = ttk.Button(add_window, text="Добавить", command = lambda: dismissal(value))
+    btn1 = ttk.Button(add_window, text="Добавить", command = lambda: dbtask.AddCustomer(fildName.get(), fildSurname.get(), fildPhone.get()))
+    btn1.grid(row=0, column=3, ipadx=6,  ipady=6, padx=5, pady=5)
+
+    add_window.mainloop()
+
+def add_new_Service_window():
+    add_window = tk.Toplevel()
+    add_window.title("Добавить услугу")
+            
+    fildName = ttk.Entry(add_window)
+    fildName.grid(row=0, column=0, ipadx=6,  ipady=6, padx=5, pady=5)
+
+    fildPrice = ttk.Entry(add_window)
+    fildPrice.grid(row=0, column=1, ipadx=6,  ipady=6, padx=5, pady=5)
+        
+    
+    btn1 = ttk.Button(add_window, text="Добавить", command = lambda: dbtask.AddService(fildName.get(), str(fildPrice.get())))
     btn1.grid(row=0, column=4, ipadx=6,  ipady=6, padx=5, pady=5)
 
     add_window.mainloop()
+
+def add_new_Employee_window():
+    add_window = tk.Toplevel()
+    add_window.title("Добавить сотрудника")
+            
+    fildName = ttk.Entry(add_window)
+    fildName.grid(row=0, column=0, ipadx=6,  ipady=6, padx=5, pady=5)
+
+    fildSurname = ttk.Entry(add_window)
+    fildSurname.grid(row=0, column=1, ipadx=6,  ipady=6, padx=5, pady=5)
+
+    fildPhone = ttk.Entry(add_window)
+    fildPhone.grid(row=0, column=2, ipadx=6,  ipady=6, padx=5, pady=5)
+        
+
+    btn1 = ttk.Button(add_window, text="Добавить", command = lambda: dbtask.AddEmployee(fildName.get(), fildSurname.get(), str(fildPhone.get())))
+    btn1.grid(row=0, column=4, ipadx=6,  ipady=6, padx=5, pady=5)
+
+    add_window.mainloop()
+
 
 def create_Employee_window():
     #Создает новое окно с таблицей.
@@ -54,8 +89,20 @@ def create_Employee_window():
     # listbox = tk.Listbox(table_window, width=40, height=10)
     # listbox.pack()
     Employees = dbtask.GetEmployees(cursor)
-    row = 0
+    row = 1
     listStringVar = []
+
+
+    label = ttk.Label(table_window, text="Имя")
+    label.grid(row=0, column=0, ipadx=6,  ipady=2, padx=5, pady=2)
+
+    label = ttk.Label(table_window, text="Фамилия")
+    label.grid(row=0, column=1, ipadx=6,  ipady=2, padx=5, pady=2)
+
+    label = ttk.Label(table_window, text="Телефон")
+    label.grid(row=0, column=2, ipadx=6,  ipady=2, padx=5, pady=2)
+
+
     for item in Employees:
         # print(item)
         listStringVar.append((tk.StringVar(value = item[0]), tk.StringVar(value = item[1]), tk.StringVar(value = item[2]), tk.StringVar(value = item[3])))
@@ -75,15 +122,13 @@ def create_Employee_window():
         fildPhone = ttk.Entry(table_window, textvariable=listStringVar[-1][2])
         fildPhone.grid(row=row, column=2, ipadx=6,  ipady=6, padx=5, pady=5)
         
-        fildID = ttk.Entry(table_window, textvariable=listStringVar[-1][3])
-        fildID.grid(row=row, column=3, ipadx=6,  ipady=6, padx=5, pady=5)
 
-        btn1 = ttk.Button(table_window, text="Уволить", command = lambda: dismissal(listStringVar[-1][3]))
+        btn1 = ttk.Button(table_window, text="Уволить", command = lambda: dbtask.EmplDismissal(listStringVar[-1][3].get()))
         btn1.grid(row=row, column=4, ipadx=6,  ipady=6, padx=5, pady=5)
 
         row += 1
 
-    btn2 = ttk.Button(table_window, text="Добавить", command = add_new_window())
+    btn2 = ttk.Button(table_window, text="Добавить", command = add_new_Employee_window)
     btn2.grid(row=row, column=0, ipadx=6,  ipady=6, padx=5, pady=5)
 
     table_window.mainloop()
@@ -99,11 +144,23 @@ def create_Customer_window():
     # listbox = tk.Listbox(table_window, width=40, height=10)
     # listbox.pack()
     Customers = dbtask.GetCustomers(cursor)
-    row = 0
+    row = 1
     listStringVar = []
+
+
+    label = ttk.Label(table_window, text="Имя")
+    label.grid(row=0, column=0, ipadx=6,  ipady=2, padx=5, pady=2)
+
+    label = ttk.Label(table_window, text="Фамилия")
+    label.grid(row=0, column=1, ipadx=6,  ipady=2, padx=5, pady=2)
+
+    label = ttk.Label(table_window, text="Телефон")
+    label.grid(row=0, column=2, ipadx=6,  ipady=2, padx=5, pady=2)
+
+
     for item in Customers:
         # print(item)
-        listStringVar.append((tk.StringVar(value = item[0]), tk.StringVar(value = item[1]), tk.StringVar(value = item[2])))
+        listStringVar.append((tk.StringVar(value = item[0]), tk.StringVar(value = item[1]), tk.StringVar(value = item[2]), tk.StringVar(value = item[3])))
         # Name = 
         # Surname = 
         # Phone  = 
@@ -118,9 +175,14 @@ def create_Customer_window():
 
         fildPhone = ttk.Entry(table_window, textvariable=listStringVar[-1][2])
         fildPhone.grid(row=row, column=2, ipadx=6,  ipady=6, padx=5, pady=5)
+
+        btn1 = ttk.Button(table_window, text="Удалить", command = lambda: dbtask.CustRemove(listStringVar[-1][3].get()))
+        btn1.grid(row=row, column=4, ipadx=6,  ipady=6, padx=5, pady=5)
+
         row += 1
 
-        # listbox.insert(tk.END, f"{Name}|{Surname}|{Phone}")
+    btn2 = ttk.Button(table_window, text="Добавить", command = add_new_Customer_window)
+    btn2.grid(row=row, column=0, ipadx=6,  ipady=6, padx=5, pady=5)
 
     table_window.mainloop()
 
@@ -135,11 +197,20 @@ def create_Service_window():
     # listbox = tk.Listbox(table_window, width=40, height=10)
     # listbox.pack()
     Services = dbtask.GetServices(cursor)
-    row = 0
+    row = 1
     listStringVar = []
+
+
+    label = ttk.Label(table_window, text="Название")
+    label.grid(row=0, column=0, ipadx=6,  ipady=2, padx=5, pady=2)
+
+    label = ttk.Label(table_window, text="Цена")
+    label.grid(row=0, column=1, ipadx=6,  ipady=2, padx=5, pady=2)
+
+
     for item in Services:
         # print(item)
-        listStringVar.append((tk.StringVar(value = item[0]), tk.StringVar(value = item[1])))
+        listStringVar.append((tk.StringVar(value = item[0]), tk.StringVar(value = item[1]), tk.StringVar(value = item[2])))
         
         # Name=
         # Price=
@@ -152,7 +223,14 @@ def create_Service_window():
 
         fildPrice = ttk.Entry(table_window, textvariable=listStringVar[-1][1])
         fildPrice.grid(row=row, column=1, ipadx=6,  ipady=6, padx=5, pady=5)
+
+        btn1 = ttk.Button(table_window, text="Удалить", command = lambda: dbtask.ServRemove(listStringVar[-1][2].get()))
+        btn1.grid(row=row, column=4, ipadx=6,  ipady=6, padx=5, pady=5)
+
         row += 1
+
+    btn2 = ttk.Button(table_window, text="Добавить", command = add_new_Service_window)
+    btn2.grid(row=row, column=0, ipadx=6,  ipady=6, padx=5, pady=5)
 
     table_window.mainloop()
 
@@ -169,11 +247,30 @@ def create_Order_window():
     # listbox = tk.Listbox(table_window, width=40, height=10)
     # listbox.pack()
     Orders = dbtask.GetOrders(cursor)
-    row = 0
+    row = 1
     listStringVar = []
+
+
+    label = ttk.Label(table_window, text="Дата")
+    label.grid(row=0, column=0, ipadx=6,  ipady=2, padx=5, pady=2)
+
+    label = ttk.Label(table_window, text="Адресс")
+    label.grid(row=0, column=1, ipadx=6,  ipady=2, padx=5, pady=2)
+
+    label = ttk.Label(table_window, text="ID услуги")
+    label.grid(row=0, column=2, ipadx=6,  ipady=2, padx=5, pady=2)
+
+    label = ttk.Label(table_window, text="ID сотрудника")
+    label.grid(row=0, column=3, ipadx=6,  ipady=2, padx=5, pady=2)
+
+    label = ttk.Label(table_window, text="ID заказчика")
+    label.grid(row=0, column=4, ipadx=6,  ipady=2, padx=5, pady=2)
+
+
     for item in Orders:
         # print(item)
-        listStringVar.append((tk.StringVar(value = item[0]), tk.StringVar(value = item[1]), tk.StringVar(value = item[2]), tk.StringVar(value = item[3]), tk.StringVar(value = item[4])))
+        listStringVar.append((tk.StringVar(value = item[0]), tk.StringVar(value = item[1]), tk.StringVar(value = item[2]), tk.StringVar(value = item[3]), tk.StringVar(value = item[4]), tk.StringVar(value = item[5])))
+
 
         # Date= 
         # Service= 
@@ -187,17 +284,24 @@ def create_Order_window():
         fildDate.grid(row=row, column=0, ipadx=6,  ipady=6, padx=5, pady=5)
 
         fildAddress = ttk.Entry(table_window, textvariable=listStringVar[-1][2])
-        fildAddress.grid(row=row, column=2, ipadx=6,  ipady=6, padx=5, pady=5)
+        fildAddress.grid(row=row, column=1, ipadx=6,  ipady=6, padx=5, pady=5)
 
         fildService = ttk.Entry(table_window, textvariable=listStringVar[-1][1])
-        fildService.grid(row=row, column=3, ipadx=6,  ipady=6, padx=5, pady=5)
+        fildService.grid(row=row, column=2, ipadx=6,  ipady=6, padx=5, pady=5)
 
         fildEmployee = ttk.Entry(table_window, textvariable=listStringVar[-1][3])
-        fildEmployee.grid(row=row, column=4, ipadx=6,  ipady=6, padx=5, pady=5)
+        fildEmployee.grid(row=row, column=3, ipadx=6,  ipady=6, padx=5, pady=5)
 
         fildCustomer = ttk.Entry(table_window, textvariable=listStringVar[-1][4])
-        fildCustomer.grid(row=row, column=5, ipadx=6,  ipady=6, padx=5, pady=5)
+        fildCustomer.grid(row=row, column=4, ipadx=6,  ipady=6, padx=5, pady=5)
+
+        btn1 = ttk.Button(table_window, text="Удалить", command = lambda: dismissal(listStringVar[-1][5].get()))
+        btn1.grid(row=row, column=6, ipadx=5,  ipady=6, padx=5, pady=5)
+
         row += 1
+
+    btn2 = ttk.Button(table_window, text="Добавить", command = add_new_Order_window)
+    btn2.grid(row=row, column=0, ipadx=6,  ipady=6, padx=5, pady=5)
 
     table_window.mainloop()
 

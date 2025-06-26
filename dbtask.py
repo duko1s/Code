@@ -11,30 +11,15 @@ def connect() -> extensions.connection:
     return conn
 
 
-def AddCustomer(custName, custSurname, custPhone):
-    connector = connect()
-    cursor = connector.cursor()
-    try:
-        cursor.execute(f"""
-                CREATE TABLE Customers(
-        CustomerID SERIAL PRIMARY KEY NOT NULL,
-        {custName} varchar (40) NOT NULL,
-        {custSurname} varchar (40) NULL,
-        {custPhone} char(15) NOT NULL
-        );
-                """)
-    except Exception as e:
-        print(e)
-    cursor.close()
-    connector.close()
 
-def Dismissal(ID):
+
+def EmplDismissal(ID):
     connector = connect()
     cursor = connector.cursor()
     try:
         cursor.execute(f"""
                 UPDATE Employees SET Status = false
-                WHERE EmployeeID = {str(ID)};
+                WHERE EmployeeID = '{str(ID)}';
                 """)
         connector.commit()
     except Exception as e:
@@ -42,6 +27,52 @@ def Dismissal(ID):
     finally:
         cursor.close()
         connector.close()
+
+def ServRemove(ID):
+    connector = connect()
+    cursor = connector.cursor()
+    try:
+        cursor.execute(f"""
+                DELETE FROM Services
+                WHERE ServiceID = '{ID}';
+                """)
+        connector.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        connector.close()
+
+def CustRemove(ID):
+    connector = connect()
+    cursor = connector.cursor()
+    try:
+        cursor.execute(f"""
+                DELETE FROM Customers
+                WHERE CustomerID = '{ID}';
+                """)
+        connector.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        connector.close()
+
+
+
+
+def AddCustomer(custName, custSurname, custPhone):
+    connector = connect()
+    cursor = connector.cursor()
+    cursor.execute(f"""
+            INSERT INTO Customers
+            (CustomerName, SurName, Phone) 
+            VALUES 
+            ('{custName}', '{custSurname}', '{custPhone}');
+            """)
+    connector.commit()
+    cursor.close()
+    connector.close()
 
 def AddEmployee(emplName, emplSurname, emplPhone):
     connector = connect()
@@ -85,7 +116,7 @@ def AddService(servName, servPrice):
     cursor = connector.cursor()
     cursor.execute(f"""
                 SELECT * FROM Services 
-                WHERE ServiceName = {servName}, Price = {servPrice};
+                WHERE ServiceName = '{servName}' AND Price = '{servPrice}';
                 """)
     count = cursor.rowcount
     if count == 0:
@@ -93,8 +124,11 @@ def AddService(servName, servPrice):
                 INSERT INTO Services
                 (ServiceName, Price) 
                 VALUES 
-                ({servName}, {servPrice});
+                ('{servName}', '{servPrice}');
                 """)
+        connector.commit()
+    cursor.close()
+    connector.close()
 
 def AddOrder(custName, custSurname, custPhone, orderDate, service, address, employee, customer):
     connector = connect()
@@ -127,21 +161,21 @@ def GetEmployees(cursor):
 def GetCustomers(cursor):
     conn = connect()
     cursor = conn.cursor()
-    cursor.execute(f"""SELECT CustomerName, Surname, Phone FROM Customers;""")
+    cursor.execute(f"""SELECT CustomerName, Surname, Phone, CustomerID FROM Customers;""")
     results = cursor.fetchall()
     return results
 
 def GetServices(cursor):
     conn = connect()
     cursor = conn.cursor()
-    cursor.execute(f"""SELECT ServiceName, Price FROM Services;""")
+    cursor.execute(f"""SELECT ServiceName, Price, ServiceID FROM Services;""")
     results = cursor.fetchall()
     return results
         
 def GetOrders(cursor):
     conn = connect()
     cursor = conn.cursor()
-    cursor.execute(f"""SELECT OrderDate, Service, Address, Employee, Customer FROM Orders;""")
+    cursor.execute(f"""SELECT OrderDate, Service, Address, Employee, Customer, OrderID FROM Orders;""")
     results = cursor.fetchall()
     return results
 
@@ -158,7 +192,7 @@ if __name__ == "__main__":
     #     print(f"{EmployeeName} {EmployeeSurname} {EmployeePhone} {EmployeeID}")
 
     # Dismissal(1)
-    AddEmployee("Клим", "Минеев", "67772223")
+    # AddEmployee("Клим", "Минеев", "67772223")
     #Dismissal(5)
 
 
